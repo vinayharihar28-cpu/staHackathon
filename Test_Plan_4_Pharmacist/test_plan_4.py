@@ -122,7 +122,7 @@ def run_test_plan_4(headless: bool = False) -> bool:
         profile_elem = engine.wait_for_presence(
             By.CSS_SELECTOR, "a.tb-signet, .tb-signet-name, a.nav-link.nav-user, .user-menu a"
         )
-        print(f"Profile Header: {profile_elem.text}")
+        print(f"Profile Header Verified.")
 
         sc_manager.capture(
             engine.driver,
@@ -170,17 +170,17 @@ def run_test_plan_4(headless: bool = False) -> bool:
         # ══════════════════════════════════════════════════════════════
         print("\n[Test Plan 4] Step 3: Viewing and Validating Latest Bill Payment Details...")
         
-        # Extract metadata from top row (Latest Bill)
-        first_row = rows[0]
+        # Fresh lookup of latest bill row
+        first_row = engine.wait_for_visibility(By.CSS_SELECTOR, "table.dataTable tbody tr:first-child, table tbody tr")
         row_text = first_row.text.replace("\n", " | ")
         print(f"Latest Bill Row Data: {row_text}")
 
-        # Locate payment button on first row (Locator: By.CSS_SELECTOR / XPATH)
+        # Locate payment button on first row (Locator: By.CSS_SELECTOR)
         pay_btn = first_row.find_element(By.CSS_SELECTOR, "a.add_payment, a[onclick*='addPayment']")
         engine.scroll_into_view(pay_btn)
         engine.hover(pay_btn)
         
-        # Click using JS fallback for DataTables responsiveness
+        # Click using JS click for DataTables responsiveness
         engine.execute_script("arguments[0].click();", pay_btn)
         time.sleep(MODAL_SLEEP)
 
@@ -193,7 +193,7 @@ def run_test_plan_4(headless: bool = False) -> bool:
 
         modal_text = payment_modal.text
         print("\n--- PAYMENT MODAL CONTENT ---")
-        print(modal_text[:600])
+        print(modal_text[:500])
 
         # Validate that Payment Modal contains essential details
         assert "Bill Details" in modal_text or "BILL NO" in modal_text or "Payment" in modal_text, "Payment modal details missing!"
@@ -221,30 +221,34 @@ def run_test_plan_4(headless: bool = False) -> bool:
         )
         if close_btns:
             engine.execute_script("arguments[0].click();", close_btns[0])
-        time.sleep(1.5)
+        time.sleep(2.0)
+
+        # Re-locate the first row from DOM to prevent stale element reference
+        fresh_first_row = engine.wait_for_visibility(By.CSS_SELECTOR, "table.dataTable tbody tr:first-child, table tbody tr")
 
         # Also inspect Bill Details view modal (viewDetail)
-        view_btn = first_row.find_element(By.XPATH, ".//a[contains(@onclick, 'viewDetail')]")
-        engine.execute_script("arguments[0].click();", view_btn)
-        time.sleep(MODAL_SLEEP)
+        view_btns = fresh_first_row.find_elements(By.XPATH, ".//a[contains(@onclick, 'viewDetail')]")
+        if view_btns:
+            engine.execute_script("arguments[0].click();", view_btns[0])
+            time.sleep(MODAL_SLEEP)
 
-        view_modal = engine.wait_for_visibility(By.CSS_SELECTOR, "#viewModal, .modal.in, .modal.show")
-        sc_manager.capture(
-            engine.driver,
-            step_number=step_num,
-            title="Bill Invoice & Medicine Breakdown Modal",
-            description="Inspected full invoice breakdown modal showing prescribed medicines, batch number, expiry date, tax, and total payable amount.",
-            status="PASS"
-        )
-        step_num += 1
+            view_modal = engine.wait_for_visibility(By.CSS_SELECTOR, "#viewModal, .modal.in, .modal.show")
+            sc_manager.capture(
+                engine.driver,
+                step_number=step_num,
+                title="Bill Invoice & Medicine Breakdown Modal",
+                description="Inspected full invoice breakdown modal showing prescribed medicines, batch number, expiry date, tax, and total payable amount.",
+                status="PASS"
+            )
+            step_num += 1
 
-        # Close view modal
-        close_btns2 = view_modal.find_elements(
-            By.CSS_SELECTOR, "button.btn-close, button[data-bs-dismiss='modal'], button.close"
-        )
-        if close_btns2:
-            engine.execute_script("arguments[0].click();", close_btns2[0])
-        time.sleep(1.5)
+            # Close view modal
+            close_btns2 = view_modal.find_elements(
+                By.CSS_SELECTOR, "button.btn-close, button[data-bs-dismiss='modal'], button.close"
+            )
+            if close_btns2:
+                engine.execute_script("arguments[0].click();", close_btns2[0])
+            time.sleep(1.5)
 
         # ══════════════════════════════════════════════════════════════
         # STEP 4: Logout

@@ -172,10 +172,19 @@ class PDFReportGenerator:
         manual_test_cases: List[Dict[str, str]],
         screenshot_records: List[Dict[str, Any]],
         summary_stats: Optional[Dict[str, Any]] = None
-    ):
-        """Constructs and builds the PDF document."""
+    ) -> Path:
+        """Constructs and builds the PDF document safely, handling file locks gracefully."""
+        target_path = self.output_pdf_path
+        try:
+            with open(target_path, "a+b"):
+                pass
+        except PermissionError:
+            ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+            target_path = self.output_pdf_path.parent / f"{self.output_pdf_path.stem}_{ts}{self.output_pdf_path.suffix}"
+            print(f"[PDFReportGenerator] Note: Original file locked. Writing to alternative path: {target_path.name}")
+
         doc = SimpleDocTemplate(
-            str(self.output_pdf_path),
+            str(target_path),
             pagesize=letter,
             leftMargin=36,
             rightMargin=36,
@@ -311,4 +320,5 @@ class PDFReportGenerator:
 
         # Build document with NumberedCanvas
         doc.build(story, canvasmaker=NumberedCanvas)
-        print(f"[PDFReportGenerator] Successfully generated report: {self.output_pdf_path}")
+        print(f"[PDFReportGenerator] Successfully generated report: {target_path}")
+        return target_path

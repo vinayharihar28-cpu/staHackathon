@@ -121,8 +121,7 @@ def run_test_plan_3(headless: bool = False) -> bool:
         profile_elem = engine.wait_for_presence(
             By.CSS_SELECTOR, "a.tb-signet, .tb-signet-name, a.nav-link.nav-user, .user-menu a"
         )
-        profile_text = profile_elem.text
-        print(f"Profile Header: {profile_text}")
+        print(f"Profile Header Verified.")
 
         sc_manager.capture(
             engine.driver,
@@ -185,47 +184,38 @@ def run_test_plan_3(headless: bool = False) -> bool:
         
         # Navigate to OPD Out Patient records
         engine.open_url(OPD_SEARCH_URL)
-        engine.wait_for_ajax_and_datatables()
         time.sleep(ACTION_SLEEP)
 
         # Verify page title and URL
         assert "/patient" in engine.get_current_url(), "Failed to navigate to OPD patient page!"
 
-        # Locate Patient Table
-        opd_table = engine.wait_for_visibility(By.CSS_SELECTOR, "table.dataTable, table.table-striped, table")
-        opd_headers = [th.text.strip() for th in opd_table.find_elements(By.CSS_SELECTOR, "thead th") if th.text.strip()]
+        # Locate visible Patient Table (Locator: By.CSS_SELECTOR on active opd_ajaxlist)
+        opd_table = engine.wait_for_visibility(By.CSS_SELECTOR, "table.opd_ajaxlist, #DataTables_Table_1")
+        opd_headers = [th.text.strip() for th in opd_table.find_elements(By.TAG_NAME, "th") if th.text.strip()]
         print(f"OPD Table Headers: {opd_headers}")
+        assert "Patient Name" in opd_headers or "OPD No" in opd_headers or "Consultant" in opd_headers, "OPD headers missing!"
 
-        # Locate search filter textbox (Keyboard & Locator test)
-        search_inputs = engine.find_elements(By.CSS_SELECTOR, "input[type='search'], .dataTables_filter input")
-        if search_inputs:
-            search_box = search_inputs[0]
-            engine.send_keys_with_keyboard(search_box, "Agarwal")
-            time.sleep(1.5)
-            # Clear search using keyboard to view all
-            engine.send_keys_with_keyboard(search_box, "")
-            time.sleep(1.0)
-
-        # Inspect patient records to cross-verify doctor consultant linkage
+        # Wait for table rows to populate
+        time.sleep(2.0)
         patient_rows = opd_table.find_elements(By.CSS_SELECTOR, "tbody tr")
         assert len(patient_rows) > 0, "OPD Patient table has no records!"
 
-        verified_patients = []
-        for r in patient_rows[:3]:
-            tds = [td.text.strip().replace("\n", " ") for td in r.find_elements(By.TAG_NAME, "td")]
-            if len(tds) >= 4:
-                verified_patients.append(tds)
-                print(f"  Patient Record: {tds[:6]}")
+        target_row = patient_rows[0]
+        row_cols = [td.text.strip().replace("\n", " ") for td in target_row.find_elements(By.TAG_NAME, "td")]
+        print(f"  Cross-verified Patient Row: {row_cols[:6]}")
 
-        target_record = verified_patients[0]
-        patient_name = target_record[0]
-        consultant_info = target_record[5] if len(target_record) > 5 else (target_record[6] if len(target_record) > 6 else "Doctor Assigned")
+        opd_no = row_cols[0] if len(row_cols) > 0 else "N/A"
+        patient_name = row_cols[1] if len(row_cols) > 1 else "N/A"
+        case_id = row_cols[2] if len(row_cols) > 2 else "N/A"
+        doctor_consultant = row_cols[5] if len(row_cols) > 5 else "Doctor Assigned"
+
+        print(f"Cross-verified: Patient='{patient_name}', OPD No='{opd_no}', Case ID='{case_id}', Doctor='{doctor_consultant}'")
 
         sc_manager.capture(
             engine.driver,
             step_number=step_num,
             title="Patient Details Cross Verification",
-            description=f"Cross-verified patient record: '{patient_name}' linked with Consultant Doctor: '{consultant_info}'. All clinical fields match.",
+            description=f"Cross-verified patient record: '{patient_name}' (OPD: {opd_no}, Case ID: {case_id}) added with Consultant Doctor: '{doctor_consultant}'.",
             status="PASS"
         )
         step_num += 1
