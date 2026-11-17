@@ -5,14 +5,6 @@ import os
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 
-import sys
-from pathlib import Path
-
-# Add current folder to sys.path
-_current_dir = Path(__file__).resolve().parent
-if str(_current_dir) not in sys.path:
-    sys.path.insert(0, str(_current_dir))
-
 from report import generate_report
 
 
