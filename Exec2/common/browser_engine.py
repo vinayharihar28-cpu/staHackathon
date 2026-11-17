@@ -10,7 +10,15 @@ from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
-from staHackathon.Exec2.common.config import DEFAULT_EXPLICIT_WAIT, IMPLICIT_WAIT, ACTION_SLEEP
+import sys
+from pathlib import Path
+
+# Ensure Exec2 directory is in sys.path
+_base_dir = Path(__file__).resolve().parent.parent
+if str(_base_dir) not in sys.path:
+    sys.path.insert(0, str(_base_dir))
+
+from common.config import DEFAULT_EXPLICIT_WAIT, IMPLICIT_WAIT, ACTION_SLEEP
 
 
 class BrowserEngine:

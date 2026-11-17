@@ -5,7 +5,15 @@ import os
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 
-from staHackathon.Exec1.report import generate_report
+import sys
+from pathlib import Path
+
+# Add current folder to sys.path
+_current_dir = Path(__file__).resolve().parent
+if str(_current_dir) not in sys.path:
+    sys.path.insert(0, str(_current_dir))
+
+from report import generate_report
 
 
 URL = "https://demo.smart-hospital.in/site/login"
