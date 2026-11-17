@@ -10,7 +10,7 @@ from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
-from common.config import DEFAULT_EXPLICIT_WAIT, IMPLICIT_WAIT, ACTION_SLEEP
+from staHackathon.Exec2.common.config import DEFAULT_EXPLICIT_WAIT, IMPLICIT_WAIT, ACTION_SLEEP
 
 
 class BrowserEngine:

@@ -8,12 +8,12 @@ root_dir = Path(__file__).resolve().parent
 if str(root_dir) not in sys.path:
     sys.path.insert(0, str(root_dir))
 
-from common.config import MASTER_PDF, TEST_PLAN_3_PDF, TEST_PLAN_4_PDF
-from common.report_generator import PDFReportGenerator
-from Test_Plan_3_Accountant.test_plan_3 import run_test_plan_3, MANUAL_TEST_CASES_PLAN_3
-from Test_Plan_4_Pharmacist.test_plan_4 import run_test_plan_4, MANUAL_TEST_CASES_PLAN_4
-from common.screenshot_manager import ScreenshotManager
-from common.config import TEST_PLAN_3_SCREENSHOTS, TEST_PLAN_4_SCREENSHOTS
+from staHackathon.Exec2.common.config import MASTER_PDF, TEST_PLAN_3_PDF, TEST_PLAN_4_PDF
+from staHackathon.Exec2.common.report_generator import PDFReportGenerator
+from staHackathon.Exec2.Test_Plan_3_Accountant.test_plan_3 import run_test_plan_3, MANUAL_TEST_CASES_PLAN_3
+from staHackathon.Exec2.Test_Plan_4_Pharmacist.test_plan_4 import run_test_plan_4, MANUAL_TEST_CASES_PLAN_4
+from staHackathon.Exec2.common.screenshot_manager import ScreenshotManager
+from staHackathon.Exec2.common.config import TEST_PLAN_3_SCREENSHOTS, TEST_PLAN_4_SCREENSHOTS
 
 
 def generate_master_pdf():

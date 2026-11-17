@@ -13,13 +13,13 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 
-from common.config import (
+from staHackathon.Exec2.common.config import (
     LOGIN_URL, PHARMACY_BILL_URL, PHARMACIST_EMAIL, PHARMACIST_PASSWORD,
     TEST_PLAN_4_SCREENSHOTS, TEST_PLAN_4_PDF, ACTION_SLEEP, MODAL_SLEEP
 )
-from common.browser_engine import BrowserEngine
-from common.screenshot_manager import ScreenshotManager
-from common.report_generator import PDFReportGenerator
+from staHackathon.Exec2.common.browser_engine import BrowserEngine
+from staHackathon.Exec2.common.screenshot_manager import ScreenshotManager
+from staHackathon.Exec2.common.report_generator import PDFReportGenerator
 
 
 MANUAL_TEST_CASES_PLAN_4 = [
